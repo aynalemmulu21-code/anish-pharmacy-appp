@@ -1,26 +1,35 @@
-# Anish — EHPLE / COC Pharmacy Study App
+name: Build Anish APK
 
-A Flutter starter app for Ethiopian pharmacy students preparing for EHPLE/COC examinations.
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
 
-## Current MVP
-- Dashboard
-- Practice section
-- 50-question test entry point
-- Full mock exam entry point
-- Pharmacy topic list
-- Progress dashboard
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-## Run
-1. Install Flutter.
-2. Open this folder in Android Studio or VS Code.
-3. Run `flutter pub get`.
-4. Run `flutter run`.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-## Next development
-- Add the actual EHPLE/COC question bank.
-- Add answer explanations and distractor explanations.
-- Add timed exams and automatic scoring.
-- Add offline question storage.
-- Add weak-topic analytics.
-- Add bookmarks and mistake review.
-- Add admin question management.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          channel: stable
+
+      - name: Create Android project files
+        run: flutter create --platforms=android .
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: anish-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
